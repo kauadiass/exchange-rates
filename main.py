@@ -1,11 +1,46 @@
-# main.py
-from services.api_client import get_real_quote
+from services.api_client import get_dollar_quote, get_euro_quote, get_bitcoin_quote
 
-if __name__ == "__main__":
-    print("Iniciando coleta de dados...")
-    real = get_real_quote()
-    if real:
-        print(f"Cotação do Real: R${real:.2f}")
+def main():
+
+    dollar_data = get_dollar_quote()
+    euro_data = get_euro_quote()
+    bitcoin_data = get_bitcoin_quote()
+
+    #print(f"DEBUG(main): Tipo de dollar_data: {type(dollar_data)}")
+    #print(f"DEBUG(main): Conteúdo de dollar_data: {dollar_data}")
+
+    if dollar_data:
+
+        dollar_bid = float(dollar_data.get('bid', 0.0))
+        dollar_high = float(dollar_data.get('high', 0.0))
+        dollar_low = float(dollar_data.get('low', 0.0))
+
+        print(f"Dólar (USD-BRL) - Compra: R${dollar_bid:.2f}, Máxima: R${dollar_high:.2f}, Mínima: R${dollar_low:.2f}")
     else:
-        print("Não foi possível obter a cotação do dólar.")
-    print("Coleta concluída.")
+        print("Não foi possível obter a cotação do Dólar.")
+
+    
+
+    if euro_data:
+
+        euro_bid = float(euro_data.get('bid', 0.0))
+        euro_high = float(euro_data.get('high', 0.0))
+        euro_low = float(euro_data.get('low', 0.0))
+
+        print(f"Euro (EUR-BRL) - Compra: R${euro_bid:.2f}, Máxima: R${euro_high:.2f}, Mínima: R${euro_low:.2f}")
+    else:
+        print("Não foi possível obter a cotação do Euro.")
+
+    if bitcoin_data:
+
+        bitcoin_bid = float(bitcoin_data.get('bid', 0.0))
+        bitcoin_high = float(bitcoin_data.get('high', 0.0))
+        bitcoin_low = float(bitcoin_data.get('low', 0.0))
+
+        print(f"Bitcoin (BTC-BRL) - Compra: R${bitcoin_bid:.2f}, Máxima: R${bitcoin_high:.2f}, Mínima: R${bitcoin_low:.2f}")
+    else:
+        print("Não foi possível obter a cotação do Bitcoin.")
+     
+        
+if __name__ == "__main__":
+    main()

@@ -1,48 +1,49 @@
-# services/api_client.py
 import requests
-from config import API_AWESOME_BASE_URL 
+from config import API_AWESOME_BASE_URL, CURRENCY_PAIR
 
-def get_dollar_quote():
+def get_currency_quote(currency_pair: str):
 
-    url = f"{API_AWESOME_BASE_URL}last/USD-BRL"
-    print(f"DEBUG: URL sendo acessada: {url}") 
+    url = f"{API_AWESOME_BASE_URL}last/{currency_pair}"
+
+   # print(f"Buscando cotação em: {url}")
 
     try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status() 
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
 
-        data = response.json() 
+        data = response.json()
+
+        key_without_hyphen = currency_pair.replace('-', '')
+
+        currency_info = data.get(key_without_hyphen)
+
+        if currency_info:
+            #print(f"DEBUG(api_client): Retornando currency_info (dicionário): {currency_info}")
+            return currency_info
+        else:
+            #print(f"Chave {key_without_hyphen} não encontrada na resposta da API para {currency_pair}. Resposta: {data}")
+            return None
         
-        print(f"DEBUG: Tipo de 'data' recebido: {type(data)}") 
-        print(f"DEBUG: Conteúdo de 'data' recebido: {data}")   
-
-        
-        dollar_info = data.get('USDBRL') 
-
-        if dollar_info:
-            return float(dollar_info['bid'])
+    except requests.exceptions.Timeout:
+        print(f"Erro: Tempo limite excedido ao buscar {currency_pair}")
         return None
+    except requests.exceptions.ConnectionError:
+        print(f"Erro: Falha na conexão ao buscar {currency_pair}. A API pode estar inacessível.")
     except requests.exceptions.RequestException as e:
-        print(f"Erro na requisição da API: {e}")
+        print(f"Erro: Erro na requisição para {currency_pair} de {url}: {e}")
         return None
-    except Exception as e: 
-        print(f"Erro inesperado no processamento da resposta da API: {e}")
+    except ValueError as e:
+        print(f"Erro: Resposta da API para {currency_pair} não é JSON válido : {e}")
         return None
-
-def get_real_quote():
-
-    url = f"{API_AWESOME_BASE_URL}last/BRL-USD"
-    print(f"DEBUG: URL sendo acessada: {url}")
-
+    except Exception as e:
+        print(f"Erro: Um erro inesperado ocorreu ao buscar {currency_pair}: {e}")
+        return None
     
-    response = requests.get(url, timeout=5)
-    response.raise_for_status()
+def get_dollar_quote():
+    return get_currency_quote(CURRENCY_PAIR["DOLAR_BRL"])
 
-    data = response.json()
+def get_euro_quote():
+    return get_currency_quote(CURRENCY_PAIR["EURO_BRL"])
 
-    print(f"DEBUG: Tipo de 'data' recebido: {type(data)}")
-    print(f"DEBUG: Conteúdo de 'data' recebido: {data}")
-
-    real_info = data.get('BRLUSD')
-
-    print(real_info)
+def get_bitcoin_quote():
+    return get_currency_quote(CURRENCY_PAIR["BITCOIN_BRL"])
