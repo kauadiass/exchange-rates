@@ -1,4 +1,3 @@
-# services/api_client.py
 import requests
 from config import API_AWESOME_BASE_URL, CURRENCY_PAIR
 
