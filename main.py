@@ -1,11 +1,12 @@
-from services.api_client import get_dollar_quote, get_euro_quote, get_bitcoin_quote
+from services.api_client import get_dollar_quote, get_euro_quote, get_bitcoin_quote, get_dollar_history, get_euro_history, get_bitcoin_history
+import datetime
 
 def main():
 
     dollar_data = get_dollar_quote()
     euro_data = get_euro_quote()
     bitcoin_data = get_bitcoin_quote()
-
+    
     #print(f"DEBUG(main): Tipo de dollar_data: {type(dollar_data)}")
     #print(f"DEBUG(main): Conteúdo de dollar_data: {dollar_data}")
 
@@ -40,6 +41,39 @@ def main():
         print(f"Bitcoin (BTC-BRL) - Compra: R${bitcoin_bid:.2f}, Máxima: R${bitcoin_high:.2f}, Mínima: R${bitcoin_low:.2f}")
     else:
         print("Não foi possível obter a cotação do Bitcoin.")
+
+
+    dollar_history_data = get_dollar_history(30)
+    euro_history_data = get_euro_history(30)
+    bitcoin_history_data = get_bitcoin_history(30)
+
+    if dollar_history_data:
+        print(f"Histórico do Dólar(últimos {len(dollar_history_data)} dias):")
+
+        for i, day_data in enumerate(dollar_history_data):
+            if i >= 5:
+                break
+
+            date_str = "N/A"
+
+            if "timestamp" in day_data and day_data["timestamp"]:
+
+                date_str = day_data
+
+                try:
+                    timestamp_int = int(day_data["timestamp"])
+                    date_obj = datetime.datetime.fromtimestamp(timestamp_int)
+                    date_str = date_obj.strftime("%Y-%m-%d %H:%M:%S")
+                except (ValueError, TypeError):
+                    date_str = 'Erro na conversão de data'    
+            bid = float(day_data.get('bid', 0.0))
+            print(f"  Data: {date_str}, Compra: R${bid:.2f}")
+    else:
+        print("Não foi possível obter o histórico do Dólar.")
+
+    if euro_history_data:
+
+    if bitcoin_history_data:
      
         
 if __name__ == "__main__":

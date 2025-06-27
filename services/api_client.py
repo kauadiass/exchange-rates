@@ -47,3 +47,36 @@ def get_euro_quote():
 
 def get_bitcoin_quote():
     return get_currency_quote(CURRENCY_PAIR["BITCOIN_BRL"])
+
+def get_currency_history(currency_pair: str, days: int = 30):
+
+    url = f"{API_AWESOME_BASE_URL}daily/{currency_pair}/{days}"
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if isinstance(data, list):
+            return data
+        else:
+            print(f"Erro Lógico: Resposta inesperada para histórico de {currency_pair}.{data}")
+    except requests.exceptions.RequestException as e:
+        print(f"Erro: Erro na requisição de histórico para {currency_pair}: {e}")
+        return None
+    except ValueError as e:
+        print(f"Erro: Resposta de histórico para {currency_pair} não é JSON válido: {e}")
+        return None
+    except Exception as e:
+        print(f"Um erro inesperado aconteceu ao buscar o histórico para {currency_pair}: {e}")
+        return None
+    
+def get_dollar_history(days: int = 30):
+    return get_currency_history(CURRENCY_PAIR["DOLAR_BRL"], days)
+
+def get_euro_history(days: int = 30):
+    return get_currency_history(CURRENCY_PAIR["EURO_BRL"], days)
+
+def get_bitcoin_history(days: int = 30):
+    return get_currency_history(CURRENCY_PAIR["BITCOIN_BRL"], days)
