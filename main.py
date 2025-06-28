@@ -73,7 +73,54 @@ def main():
 
     if euro_history_data:
 
+        print(f"Histórico do Euro(últimos {len(euro_history_data)})")
+
+        for i, day_data in enumerate(euro_history_data):
+            if i >= 5:
+                break
+
+            date_str = "N/A"
+
+            if "timestamp" in day_data and day_data["timestamp"]:
+
+                date_str = day_data
+
+                try:
+                    timestamp_int = int(day_data["timestamp"])
+                    date_obj = datetime.datetime.fromtimestamp(timestamp_int)
+                    date_str = date_obj.strftime("%Y-%m-%d %H:%M:%S")
+                except(ValueError, TypeError):
+                    date_str = "Erro na conversão de data"
+            bid = float(day_data.get("bid", 0.0))
+            print(f" Data: {date_str}, Compra: R${bid:.2f}")
+    else:
+        print("Não foi possível obter o histórico do Euro")  
+
     if bitcoin_history_data:
+
+        print(f"Histórico do Bitcoin(últimos {len(bitcoin_history_data)})")
+
+        for i, day_data in enumerate(bitcoin_history_data):
+            if i >= 5:
+                break
+
+            date_str = "N/A"
+
+            if "timestamp" in day_data and day_data["timestamp"]:
+
+                date_str = day_data
+
+                try:
+                    timestamp_int = int(day_data["timestamp"])
+                    date_obj = datetime.datetime.fromtimestamp(timestamp_int)
+                    date_str = date_obj.strftime("%Y-%m-%d %H:%M:%S")
+                except(ValueError, TypeError):
+                    date_str = "Erro na conversão de data"
+            bid = float(day_data.get("bid", 0.0))
+            print(f"Data: {date_str}, Compra: R${bid:.2f}")
+    else:
+        print("Não foi possível obter o histórico do Bitcoin")
+        
      
         
 if __name__ == "__main__":
