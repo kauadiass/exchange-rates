@@ -1,6 +1,8 @@
+from config import API_AWESOME_BASE_URL, CURRENCY_PAIR, API_BCB_SELIC_URL
 import requests
-from config import API_AWESOME_BASE_URL, CURRENCY_PAIR
+import datetime
 
+#CURRENCY QUOTE
 def get_currency_quote(currency_pair: str):
 
     url = f"{API_AWESOME_BASE_URL}last/{currency_pair}"
@@ -48,6 +50,7 @@ def get_euro_quote():
 def get_bitcoin_quote():
     return get_currency_quote(CURRENCY_PAIR["BITCOIN_BRL"])
 
+#CURRENCY HISTORY
 def get_currency_history(currency_pair: str, days: int = 30):
 
     url = f"{API_AWESOME_BASE_URL}daily/{currency_pair}/{days}"
@@ -80,3 +83,50 @@ def get_euro_history(days: int = 30):
 
 def get_bitcoin_history(days: int = 30):
     return get_currency_history(CURRENCY_PAIR["BITCOIN_BRL"], days)
+
+#SELIC RATE 
+
+def get_selic_rate_history(months: int = 6):
+
+    hoje = datetime.date.today()
+    data_final = hoje.strftime("%d/%m/%Y")
+
+    data_inicial_obj = hoje - datetime.timedelta(days=30 * months)
+    data_inicial = data_inicial_obj.strftime("%d/%m/%Y")
+
+    url = f"{API_BCB_SELIC_URL}&dataInicial={data_inicial}&dataFinal={data_final}"
+
+    print(f"Buscando taxa selic em: {url}")
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if isinstance(data, list) and data:
+            print(f"Resposta JSON completa da selic: {data}")
+            return data
+        else:
+            print(f"Resposta inesperada para selic. Não é uma lista ou está vazia. Resposta: {data}")
+            return None
+    except requests.exceptions.Timeout:
+        print(f"Tempo limite excedido ao buscar taxa selic.")
+        return None
+    except requests.exceptions.ConnectionError:
+        print(f"Erro de conexão ao buscar taxa selic. API pode estar inacessível")
+        return None
+    except requests.exceptions.HTTPError as e:
+        status_code = e.response.status_code if e.response else "N/A"
+        error_text = e.response.text if e.response else "N/A"
+        print(f"Erro ao buscar taxa SELIC: Status {status_code}. Detalhe: {e}. Resposta da API: {error_text[:200]}...")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Erro de Requisição geral ao buscar taxa SELIC: {e}")
+        return None
+    except ValueError as e:
+        print(f"Resposta da API para SELIC não é JSON válido: {e}")
+        return None
+    except Exception as e:
+        print(f"Um erro inesperado ocorreu ao buscar taxa SELIC: {e}")
+        return None
