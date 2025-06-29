@@ -1,4 +1,4 @@
-from services.api_client import get_dollar_quote, get_euro_quote, get_bitcoin_quote, get_dollar_history, get_euro_history, get_bitcoin_history
+from services.api_client import get_dollar_quote, get_euro_quote, get_bitcoin_quote, get_dollar_history, get_euro_history, get_bitcoin_history, get_selic_rate_history
 import datetime
 
 def main():
@@ -41,6 +41,7 @@ def main():
         print(f"Bitcoin (BTC-BRL) - Compra: R${bitcoin_bid:.2f}, Máxima: R${bitcoin_high:.2f}, Mínima: R${bitcoin_low:.2f}")
     else:
         print("Não foi possível obter a cotação do Bitcoin.")
+
 
 
     dollar_history_data = get_dollar_history(30)
@@ -120,6 +121,21 @@ def main():
             print(f"Data: {date_str}, Compra: R${bid:.2f}")
     else:
         print("Não foi possível obter o histórico do Bitcoin")
+
+
+
+    selic_data = get_selic_rate_history(months=6)
+
+    if selic_data:
+        print(f"Taxa SELIC (últimos {len(selic_data)} registros nos 6 meses):")
+
+        for entry in selic_data[-10:]:
+            data_formatada = entry.get("data", "N/A")
+            valor = float(entry.get("valor", 0.0))
+            print(f" Data: {data_formatada}, Valor {valor:.2f}%")
+    else:
+        print("Não foi possível obter os dados da taxa selic.")
+                
         
      
         
